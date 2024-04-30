@@ -1,6 +1,7 @@
 import base64
 import random
 import string
+import datetime
 from tkinter import *
 from tkinter import messagebox
 
@@ -54,6 +55,7 @@ def save():
     email = email_input.get().lower()
     temp_pass = password_input.get()
     password = encode_password(temp_pass)
+    today_datetime = datetime.datetime.today()
 
     if not website or not email or not password:
         print("All fields must be filled!")
@@ -64,7 +66,7 @@ def save():
     if check():
 
         with open("data.txt", "a+") as credentials_file:
-            credentials_file.write(f"{website} | {email} | {password}\n")
+            credentials_file.write(f"{website} | {email} | {password} | {today_datetime}\n")
             website_input.delete(0, END)
             password_input.delete(0, END)
             messagebox.showinfo("Confirmation", "Credentials were saved!")

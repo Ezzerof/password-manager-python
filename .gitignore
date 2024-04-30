@@ -22,4 +22,4 @@ Thumbs.db
 # Environment variables
 .env
 
-.txt
+*.txt

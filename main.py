@@ -15,7 +15,6 @@ def check():
 
     with open("data.txt", "r+") as credentials_file:
         lines = credentials_file.readlines()
-        credentials_file.seek(0)
 
         for idx, line in enumerate(lines):
             text = line.strip().split(" | ")
@@ -44,6 +43,10 @@ def decode_password(encoded_password):
     decoded_password = base64.b64decode(encoded_password.encode('utf-8'))
     return decoded_password.decode('utf-8')
 
+def create_credentials_file():
+    file = open("data.txt", "a")
+    file.close()
+
 # Save user to file
 
 def save():
@@ -56,10 +59,11 @@ def save():
         print("All fields must be filled!")
         messagebox.showerror("Error", "All fields must be filled!")
         return
+    create_credentials_file()
 
     if check():
 
-        with open("data.txt", "a") as credentials_file:
+        with open("data.txt", "a+") as credentials_file:
             credentials_file.write(f"{website} | {email} | {password}\n")
             website_input.delete(0, END)
             password_input.delete(0, END)
@@ -87,6 +91,29 @@ def generate():
 
     password_input.insert(1, password)
 
+def search():
+    searched_website = website_input.get()
+
+    if not searched_website:
+        messagebox.showerror("Error", "The Website field cannot be empty!")
+        return
+
+    with open("data.txt", "r") as websites_file:
+        lines = websites_file.readlines()
+
+        for idx, line in enumerate(lines):
+            text = line.strip().split(" | ")
+            website = text[0]
+            email = text[1]
+            password = decode_password(text[2])
+
+            if website == searched_website:
+                messagebox.showinfo("Credentials", f"Email: {email}\nPassword: {password}")
+                return
+
+        messagebox.showerror("Error", f"The following: {searched_website} doesn't exist")
+        return
+
 
 # UI
 window = Tk()
@@ -108,9 +135,9 @@ password_label = Label(window, text="Password:")
 password_label.grid(row=3, column=0)
 
 # Entries
-website_input = Entry(window, width=55)
+website_input = Entry(window, width=21)
 website_input.focus()
-website_input.grid(row=1, column=1, columnspan=2)
+website_input.grid(row=1, column=1, sticky="EW")
 email_input = Entry(window, width=55)
 email_input.insert(0, "email@gmail.com")
 email_input.grid(row=2, column=1, columnspan=2)
@@ -122,5 +149,7 @@ generate_password_button = Button(window, text="Generate Password", width=14, co
 generate_password_button.grid(row=3, column=2, sticky="EW")
 add_button = Button(window, text="Add", width=36, command=save)
 add_button.grid(row=4, column=1, columnspan=2, sticky="EW")
+search_button = Button(window, text="Search", width=14, command=search)
+search_button.grid(row=1, column=2, sticky="EW")
 
 window.mainloop()
